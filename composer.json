@@ -1,0 +1,29 @@
+{
+    "name": "php-solution/jwt-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony bundle for work with JWT.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oleksandr Savchenko",
+            "email": "dev.olsav@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "lcobucci/jwt": "dev-master",
+        "symfony/dependency-injection": "^3.0",
+        "symfony/http-kernel": "^3.0",
+        "symfony/config": "^3.0"
+    },
+    "autoload":     {
+        "psr-4": { "PhpSolution\\JwtBundle\\": "src/" }
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.x-dev"
+        }
+    }
+}
