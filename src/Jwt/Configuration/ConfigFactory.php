@@ -15,7 +15,6 @@ class ConfigFactory
     public const OPTION_SIGNKEY_CONTENT = 'signkey_content';
     public const OPTION_SIGNKEY_PASS = 'signkey_pass';
     public const OPTION_VERKEY_CONTENT = 'verkey_content';
-    public const OPTION_VERKEY_PASS = 'verkey_pass';
 
     /**
      * @var string
@@ -124,9 +123,6 @@ class ConfigFactory
     private function getVerificationKey(): Key
     {
         return $this->verificationKey
-            ?: $this->verificationKey = new Key(
-                $this->options[self::OPTION_VERKEY_CONTENT] ?? '',
-                $this->options[self::OPTION_VERKEY_PASS] ?? ''
-            );
+            ?: $this->verificationKey = new Key($this->options[self::OPTION_VERKEY_CONTENT] ?? '');
     }
 }

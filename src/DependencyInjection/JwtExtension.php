@@ -50,7 +50,6 @@ class JwtExtension extends Extension
                         ConfigFactory::OPTION_SIGNKEY_CONTENT => $conf['signing_key']['content'],
                         ConfigFactory::OPTION_SIGNKEY_PASS => $conf['signing_key']['pass'],
                         ConfigFactory::OPTION_VERKEY_CONTENT => $conf['verification_key']['content'],
-                        ConfigFactory::OPTION_VERKEY_PASS => $conf['verification_key']['pass'],
                     ]
                 );
             if (isset($conf['signer']['service_id'])) {

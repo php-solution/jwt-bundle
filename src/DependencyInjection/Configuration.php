@@ -74,7 +74,6 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('service_id')->defaultNull()->end()
                                     ->scalarNode('content')->defaultNull()->end()
-                                    ->scalarNode('pass')->defaultNull()->end()
                                 ->end()
                             ->end()
                         ->end()
