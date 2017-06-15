@@ -16,7 +16,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
     public const OPTION_HEADERS = 'headers';
     public const OPTION_ISSUER = 'issuer';
     public const OPTION_ISSUED_AT = 'issued_at';
-    public const OPTION_EXPR = 'exr';
+    public const OPTION_EXP = 'exp';
     public const OPTION_USED_AFTER = 'used_after';
     public const OPTION_ID = 'id';
     public const OPTION_AUDIENCE = 'audience';
@@ -138,7 +138,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
             static::OPTION_USED_AFTER => function (BuilderInterface $builder, $configValue) {
                 $builder->canOnlyBeUsedAfter(new \DateTimeImmutable('+' . $configValue . 'second'));
             },
-            static::OPTION_EXPR => function (BuilderInterface $builder, $configValue) {
+            static::OPTION_EXP => function (BuilderInterface $builder, $configValue) {
                 $builder->expiresAt(new \DateTimeImmutable('+' . $configValue . 'second'));
             },
         ];

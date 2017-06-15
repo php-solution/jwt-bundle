@@ -108,7 +108,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode(ConfigurableType::OPTION_AUDIENCE)->defaultNull()->end()
                             ->scalarNode(ConfigurableType::OPTION_ID)->defaultNull()->end()
                             ->scalarNode(ConfigurableType::OPTION_ISSUER)->defaultNull()->end()
-                            ->integerNode(ConfigurableType::OPTION_EXPR)->defaultNull()->end()
+                            ->integerNode(ConfigurableType::OPTION_EXP)->defaultNull()->end()
                             ->integerNode(ConfigurableType::OPTION_USED_AFTER)->defaultNull()->end()
                             ->integerNode(ConfigurableType::OPTION_ISSUED_AT)->defaultNull()->end()
                         ->end()
