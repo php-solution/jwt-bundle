@@ -55,6 +55,7 @@ class JwtManager
         foreach ($headers as $headerName => $headerValue) {
             $builder->withHeader($headerName, $headerValue);
         }
+        $builder->relatedTo($typeName);
         $type->configureBuilder($builder);
 
         return $builder->getToken($config->getSigner(), $config->getSigningKey());
