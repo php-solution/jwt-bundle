@@ -15,7 +15,6 @@ jwt:
         pass: 'test'
       verification_key:
         content: 'file://%kernel.project_dir%/etc/jwt/keys/public.pub'
-        pass: ''
 ````
 
 If you want use signer, signing_key, verification_key as DI service use this example: 
@@ -155,7 +154,6 @@ jwt:
       verification_key:
         service_id: ~
         content: ~
-        pass: ~
   types:
     authorization:
       configuration: 'default'
