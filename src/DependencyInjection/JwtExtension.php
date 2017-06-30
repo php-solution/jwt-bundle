@@ -62,7 +62,7 @@ class JwtExtension extends Extension
                 $def->addMethodCall('setVerificationKey', [new Reference($conf['signer']['service_id'])]);
             }
 
-            $id = 'jwt.configuration.' . $conf['name'];
+            $id = 'jwt.configuration.' . $name;
             $container->setDefinition($id, $def);
             $registryDef->addMethodCall('addConfigFactory', [new Reference($id)]);
         }
