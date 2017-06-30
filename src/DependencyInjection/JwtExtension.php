@@ -40,10 +40,10 @@ class JwtExtension extends Extension
         $registryDef = $container->getDefinition('jwt.configuration_registry');
         $registryDef->replaceArgument(0, $configs['default_configuration']);
 
-        foreach ($configs['configurations'] as $conf) {
+        foreach ($configs['configurations'] as $name => $conf) {
             $def = (new Definition(ConfigFactory::class))
                 ->setPublic(false)
-                ->setArgument(0, $conf['name'])
+                ->setArgument(0, $name)
                 ->setArgument(1, $conf['asymmetric'])
                 ->setArgument(2, [
                         ConfigFactory::OPTION_SIGNER => $conf['signer']['class'],
