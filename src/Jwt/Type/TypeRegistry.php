@@ -44,7 +44,7 @@ class TypeRegistry
     {
         if (!$this->registry->offsetExists($name)) {
             if (array_key_exists($name, $this->options)) {
-                $this->addType(new ConfigurableType($name, $this->options[$name]));
+                $this->addType(new ConfigurableType($name, $this->options[$name]['configuration'], $this->options[$name]['options']));
             } elseif (class_exists($name) && in_array(TypeInterface::class, class_implements($name))) {
                 $this->addType(new $name());
             } else {

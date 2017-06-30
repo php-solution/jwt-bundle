@@ -12,6 +12,17 @@ use Lcobucci\JWT\Validation\Constraint;
  */
 class ConfigurableType extends BasicType implements TypeConfigInterface
 {
+    public const OPTIONS = [
+        self::OPTION_CLAIMS,
+        self::OPTION_HEADERS,
+        self::OPTION_ISSUER,
+        self::OPTION_ISSUED_AT,
+        self::OPTION_EXP,
+        self::OPTION_USED_AFTER,
+        self::OPTION_ID,
+        self::OPTION_AUDIENCE,
+        self::OPTION_SUBJECT,
+    ];
     public const OPTION_CLAIMS = 'claimes';
     public const OPTION_HEADERS = 'headers';
     public const OPTION_ISSUER = 'issuer';
@@ -21,12 +32,15 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
     public const OPTION_ID = 'id';
     public const OPTION_AUDIENCE = 'audience';
     public const OPTION_SUBJECT = 'subject';
-    public const OPTION_CONF_NAME = 'configuration';
-    
+
     /**
      * @var string
      */
     protected $name;
+    /**
+     * @var string
+     */
+    protected $configurationName;
     /**
      * @var array
      */
@@ -43,13 +57,15 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
     /**
      * ConfigurableType constructor.
      *
-     * @param string $name
-     * @param array  $options
+     * @param string      $name
+     * @param array       $options
+     * @param string|null $configurationName
      */
-    public function __construct(string $name, array $options = [])
+    public function __construct(string $name, ?string $configurationName, array $options = [])
     {
         $this->name = $name;
         $this->options = $options;
+        $this->configurationName = $configurationName;
     }
 
     /**
@@ -65,7 +81,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
      */
     public function getConfigurationName():? string
     {
-        return $this->options[static::OPTION_CONF_NAME] ?? null;
+        return $this->configurationName;
     }
 
     /**
