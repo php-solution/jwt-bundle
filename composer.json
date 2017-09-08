@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=7.1",
-        "lcobucci/jwt": "dev-master",
+        "lcobucci/jwt": "^4.0",
         "symfony/dependency-injection": "^3.0",
         "symfony/http-kernel": "^3.0",
         "symfony/config": "^3.0"
