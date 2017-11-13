@@ -28,6 +28,14 @@ jwt:
       signing_key: 'jwt_signing_key_service_id'
       verification_key: 'jwt_verification_key_service_id'
 ````
+## Generate the JWT keys
+````Bash
+$ mkdir -p config/jwt
+$ openssl genrsa -out config/jwt/private.pem -aes256 4096
+$ openssl rsa -pubout -in config/jwt/private.pem -out var/jwt/public.pem
+````
+
+
 ## Configure JWT Types on config.yaml
 You can specify JWT Type on your basic config.yaml.
 If configuration is null, system set default configuration
