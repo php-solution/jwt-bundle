@@ -84,6 +84,32 @@ class JwtManager
     }
 
     /**
+     * @param string $tokenStr
+     * @param string $tokenType
+     * @param array  $requiredClaims
+     *
+     * @return Token
+     * @throws InvalidTokenException
+     */
+    public function parseTokenWithClaims(string $tokenStr, string $tokenType, array $requiredClaims): Token
+    {
+        /* @var $jwtToken Token\Plain */
+        $jwtToken = $this->parse($tokenStr, $tokenType);
+        if (!$jwtToken instanceof Token\Plain) {
+            throw new InvalidTokenException(sprintf('Token must be instanceof "%s"', Token\Plain::class));
+        }
+
+        $claims = $jwtToken->claims();
+        foreach ($requiredClaims as $claim) {
+            if (!$claims->has($claim)) {
+                throw new InvalidTokenException(sprintf('Undefined claim "%s" for token', $claim));
+            }
+        }
+
+        return $jwtToken;
+    }
+
+    /**
      * @param TypeInterface $type
      *
      * @return Configuration
