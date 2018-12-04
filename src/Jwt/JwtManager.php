@@ -49,6 +49,7 @@ class JwtManager
         $type = $this->typeRegistry->getTypeByName($typeName);
         $config = $this->getConfigurationByType($type);
         $builder = $config->createBuilder();
+        $builder->issuedAt(new \DateTimeImmutable());
         foreach ($claims as $claimName => $claimValue) {
             $builder->withClaim($claimName, $claimValue);
         }
