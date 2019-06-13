@@ -121,6 +121,16 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
     }
 
     /**
+     * @param integer $configValue
+     *
+     * @return \DateTimeImmutable
+     */
+    private function getTime($configValue)
+    {
+        return (new \DateTimeImmutable())->setTimestamp(\time() + $configValue);
+    }
+
+    /**
      * @return array
      */
     private function createBuilderHandlers(): array
@@ -149,13 +159,13 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
                 $builder->relatedTo((string) $configValue);
             },
             static::OPTION_ISSUED_AT => function (BuilderInterface $builder, $configValue) {
-                $builder->issuedAt(new \DateTimeImmutable('+' . $configValue . 'second'));
+                $builder->issuedAt($this->getTime($configValue));
             },
             static::OPTION_USED_AFTER => function (BuilderInterface $builder, $configValue) {
-                $builder->canOnlyBeUsedAfter(new \DateTimeImmutable('+' . $configValue . 'second'));
+                $builder->canOnlyBeUsedAfter($this->getTime($configValue));
             },
             static::OPTION_EXP => function (BuilderInterface $builder, $configValue) {
-                $builder->expiresAt(new \DateTimeImmutable('+' . $configValue . 'second'));
+                $builder->expiresAt($this->getTime($configValue));
             },
         ];
     }
