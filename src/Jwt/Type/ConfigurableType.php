@@ -125,7 +125,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
      *
      * @return \DateTimeImmutable
      */
-    private function getTime($configValue)
+    private function getTime(int $configValue): \DateTimeImmutable
     {
         return (new \DateTimeImmutable())->setTimestamp(\time() + $configValue);
     }
