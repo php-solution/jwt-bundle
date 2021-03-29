@@ -16,3 +16,4 @@ services:
 
     PhpSolution\JwtBundle\Jwt\JwtManager:
         public: true
+        alias: 'jwt.manager'
