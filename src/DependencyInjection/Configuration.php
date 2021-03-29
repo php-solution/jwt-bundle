@@ -17,8 +17,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('jwt');
+        $treeBuilder = new TreeBuilder('jwt');
+        $rootNode = $treeBuilder->getRootNode();
         $this->addConfigurationSection($rootNode);
         $this->addConfigurableTypeSection($rootNode);
 

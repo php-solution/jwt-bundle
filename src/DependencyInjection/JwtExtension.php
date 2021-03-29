@@ -38,7 +38,7 @@ class JwtExtension extends Extension
     private function registerConfigurations(array $configs, ContainerBuilder $container): void
     {
         $registryDef = $container->getDefinition('jwt.configuration_registry');
-        $registryDef->replaceArgument(0, $configs['default_configuration']);
+        $registryDef->setArgument(0, $configs['default_configuration']);
 
         foreach ($configs['configurations'] as $name => $conf) {
             $def = (new Definition(ConfigFactory::class))
