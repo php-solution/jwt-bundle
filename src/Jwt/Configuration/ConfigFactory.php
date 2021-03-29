@@ -111,7 +111,7 @@ class ConfigFactory
     private function getSigningKey(): Key
     {
         return $this->signingKey
-            ?: $this->signingKey = new Key(
+            ?: $this->signingKey = Key\InMemory::plainText(
                 $this->options[self::OPTION_SIGNKEY_CONTENT] ?? '',
                 $this->options[self::OPTION_SIGNKEY_PASS] ?? ''
             );
@@ -123,6 +123,6 @@ class ConfigFactory
     private function getVerificationKey(): Key
     {
         return $this->verificationKey
-            ?: $this->verificationKey = new Key($this->options[self::OPTION_VERKEY_CONTENT] ?? '');
+            ?: $this->verificationKey = Key\InMemory::plainText($this->options[self::OPTION_VERKEY_CONTENT] ?? '');
     }
 }

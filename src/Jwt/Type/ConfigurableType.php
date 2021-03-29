@@ -105,7 +105,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
     public function getConstraints(Configuration $config):? iterable
     {
         yield from parent::getConstraints($config);
-        yield new Constraint\ValidAt(new SystemClock());
+        yield new Constraint\LooseValidAt(SystemClock::fromSystemTimezone());
         if (array_key_exists(static::OPTION_SUBJECT, $this->options) && !empty($this->options[static::OPTION_SUBJECT])) {
             yield new Constraint\RelatedTo($this->options[static::OPTION_SUBJECT]);
         }
