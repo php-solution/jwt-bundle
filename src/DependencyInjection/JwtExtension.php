@@ -9,6 +9,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use function array_merge;
+use function is_array;
 
 /**
  * Class JwtExtension
@@ -27,8 +29,34 @@ class JwtExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
+        $config = $this->fixOldConfig($config);
+
         $this->registerConfigurations($config, $container);
         $this->registerTypes($config, $container);
+    }
+
+    private function fixOldConfig(array $config): array
+    {
+        if (!isset($config['types']) || !is_array($config['types'])) {
+            return $config;
+        }
+
+        foreach ($config['types'] as $type => $typeConfig) {
+            if (!isset($typeConfig['options']['claimes']) || !is_array($typeConfig['options']['claimes'])) {
+                continue;
+            }
+
+            $claims = $typeConfig['options']['claimes'];
+            if (isset($typeConfig['options']['claims']) && is_array($typeConfig['options']['claims'])) {
+                // new field overrides old values
+                $claims = array_merge($claims, $typeConfig['options']['claims']);
+            }
+
+            $config['types'][$type]['options']['claims'] = $claims;
+            unset($config['types'][$type]['options']['claimes']);
+        }
+
+        return $config;
     }
 
     /**

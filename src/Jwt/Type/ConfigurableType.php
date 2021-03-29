@@ -23,7 +23,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
         self::OPTION_AUDIENCE,
         self::OPTION_SUBJECT,
     ];
-    public const OPTION_CLAIMS = 'claimes';
+    public const OPTION_CLAIMS = 'claims';
     public const OPTION_HEADERS = 'headers';
     public const OPTION_ISSUER = 'issuer';
     public const OPTION_ISSUED_AT = 'issued_at';
