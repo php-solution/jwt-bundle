@@ -78,10 +78,15 @@ class UserConfirmController extends Controller
     }
 }
 ````
-## Specify service as JWT Type
+
+
+## Specify JWT Type as a service
+
+Create the token type, making sure *at the very least* the *SignedWith* constraint
+is returned by `getConstraints` - otherwise your token will be unsafe and not verified:
+
 ````PHP
-<?php
-namespace App\Services\JwtType;
+// src/Service/UserConfirm.php
 
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Builder as BuilderInterface;
@@ -89,9 +94,6 @@ use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Validation\Constraint;
 use PhpSolution\JwtBundle\Jwt\Type\TypeInterface;
 
-/**
- * Class UserConfirm
- */
 class UserConfirm implements TypeInterface
 {
     private const EXP_TIME = 3600;
@@ -110,37 +112,48 @@ class UserConfirm implements TypeInterface
     public function getConstraints(Configuration $config):? iterable
     {
         yield new Constraint\SignedWith($config->getSigner(), $config->getVerificationKey());
-        yield new Constraint\ValidAt(new SystemClock());
+        yield new Constraint\ValidAt(SystemClock::fromSystemTimezone());
     }
 }
 ````
-on service.yaml
+
+If you use autoconfiguration, implementing the TypeInterface automatically tags the service for you.
+Otherwise tag the service manually:
+
 ````YAML
+// config/services.yaml
 services:
     jwt.type.user_confirm_registration:
         class: 'App\Services\JwtType\UserConfirmReg'
-        tags: [{name: 'jwt.token_type'}]
+        tags: ['jwt.token_type']
 ````
-using on controller:
+
+Then use it somewhere - like in a controller:
+
 ````PHP
 <?php
+// src/Controller/UserConfirmController.php
+
 use App\Services\JwtType\UserConfirm;
-/**
- * Class UserConfirm
- */
+use PhpSolution\JwtBundle\Jwt\TokenManagerInterface;
+
 class UserConfirmController extends Controller
 {
+    private TokenManagerInterface $tokenManager;
+
+    public function __construct(TokenManagerInterface $tokenManager){
+        $this->tokenManager = $tokenManager;
+    }
+
     public function sendLinkAction(): Response
     {
-        /* @var $token \Lcobucci\JWT\Token\Plain */
-        $token = $this->get('jwt.manager')->create(UserConfirm::NAME, ['user_id' => $userId]);
-        $jwtStr = $token->__toString();
+        $token = $this->tokenManager->create(UserConfirm::NAME, ['user_id' => $userId]);
+        $jwtStr = $token->toString(); // this is your encoded JWT token
     }
-    
+
     public function confirmAction(string $token): Response
     {
-        /* @var $token \Lcobucci\JWT\Token\Plain */
-        $token = $this->get('jwt.manager')->parse($token, UserConfirm::NAME);
+        $token = $this->tokenManager->parseTokenWithClaims($token, UserConfirm::NAME, ['user_id']);
         $userId = $token->claims()->get('user_id');
     }
 }

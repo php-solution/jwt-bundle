@@ -3,6 +3,7 @@
 namespace PhpSolution\JwtBundle\DependencyInjection;
 
 use PhpSolution\JwtBundle\Jwt\Configuration\ConfigFactory;
+use PhpSolution\JwtBundle\Jwt\Type\TypeInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -23,6 +24,9 @@ class JwtExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $container->registerForAutoconfiguration(TypeInterface::class)
+            ->addTag('jwt.token_type');
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
