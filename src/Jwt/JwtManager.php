@@ -12,12 +12,11 @@ use PhpSolution\JwtBundle\Jwt\Exception\InvalidTokenType;
 use PhpSolution\JwtBundle\Jwt\Type\TypeConfigInterface;
 use PhpSolution\JwtBundle\Jwt\Type\TypeInterface;
 use PhpSolution\JwtBundle\Jwt\Type\TypeRegistry;
-use function get_class;
 
 /**
  * Class JwtTokenManager
  */
-class JwtManager
+class JwtManager implements TokenManagerInterface
 {
     /**
      * @var ConfigRegistry
