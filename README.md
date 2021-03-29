@@ -1,5 +1,5 @@
 # JwtBundle
-This bundle allows developer to use "lcobucci/jwt" lib for work with JWT. 
+This bundle allows developer to use "[lcobucci/jwt](https://github.com/lcobucci/jwt)" lib for work with JWT.
 
 ## Configure JWT Configuration
 ````YAML
@@ -44,15 +44,16 @@ jwt:
   types:
     authorization: #name of type
       configuration: 'default'
-      exr: 0
-      issued_at: 0
-      used_after: 0
-      claimes: []
-      headers: []
-      issuer: ''
-      id: ''
-      audience: ''
-      subject: ''
+      options:
+        exr: 0
+        issued_at: 0
+        used_after: 0
+        claims: []
+        headers: []
+        issuer: ''
+        id: ''
+        audience: ''
+        subject: ''
 ````
 using on controller:
 ````PHP
@@ -165,13 +166,14 @@ jwt:
   types:
     authorization:
       configuration: 'default'
-      exr: ~
-      issued_at: ~
-      used_after: ~
-      claimes: []
-      headers: []
-      issuer: ~
-      id: ~
-      audience: ~
-      subject: ~
+      options:
+        exr: ~
+        issued_at: ~
+        used_after: ~
+        claims: []
+        headers: []
+        issuer: ~
+        id: ~
+        audience: ~
+        subject: ~
 ````
