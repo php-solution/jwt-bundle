@@ -1,8 +1,42 @@
 # JwtBundle
-This bundle allows developer to use "[lcobucci/jwt](https://github.com/lcobucci/jwt)" lib for work with JWT.
+This [Symfony](https://symfony.com/) bundle allows developers to generate and validate any
+[JSON Web Tokens](https://tools.ietf.org/html/rfc7519) (JWTs) using convenient services.
 
-## Configure JWT Configuration
+It leverages power of the widely-used, robust "[lcobucci/jwt](https://github.com/lcobucci/jwt)"
+library, which provides most of the functionality, security and reliability.
+
+
+## Installation
+Like any other Symfony bundle, use Composer to install it:
+```sh
+composer require php-solution/jwt-bundle
+```
+
+Symfony Flex should auto-register the bundle for you.
+If it doesn't, modify your `bundles.php` file:
+
+```PHP
+return [
+    // ...
+    PhpSolution\JwtBundle\JwtBundle::class => ['all' => true],
+];
+```
+
+
+## Configuration
+This bundle supports sets of configurations and sets of JWT Token Types.
+
+Configurations define signing and verification options, token types are presets for simple
+JWT tokens that you can use in your code. For more advanced token setups
+[specify JWT types as services](#specify-jwt-types-as-services).
+
+### Token signing configuration
+
+If you generate and consume the JWT tokens only yourself, you can use a symmetric key.
+Otherwise you probably want to use public-key (aka asymmetric) cryptography for signing and verification.
+
 ````YAML
+// config/packages/jwt.yaml
 jwt:
   default_configuration: 'default'
   configurations:
@@ -11,14 +45,20 @@ jwt:
       signer:
         class: 'Lcobucci\JWT\Signer\Rsa\Sha512'
       signing_key:
-        content: 'file://%kernel.project_dir%/etc/jwt/keys/private.pem'
+        content: 'file://%kernel.project_dir%/config/secrets/jwt/key.pem'
         pass: 'test'
       verification_key:
-        content: 'file://%kernel.project_dir%/etc/jwt/keys/public.pub'
+        content: 'file://%kernel.project_dir%/config/secrets/jwt/key.pub.pem'
 ````
 
-If you want use signer, signing_key, verification_key as DI service use this example: 
+For detailed documentation about the signing process and the signer classes see
+the [JWT library documentation](https://lcobucci-jwt.readthedocs.io/en/latest/configuration/).
+
+You can also specify custom services for `signer`, `signing_key` and `verification_key`.
+This gives you full control over signing and verification:
+
 ````YAML
+// config/packages/jwt.yaml
 jwt:
   default_configuration: 'default'
   configurations:
@@ -28,18 +68,30 @@ jwt:
       signing_key: 'jwt_signing_key_service_id'
       verification_key: 'jwt_verification_key_service_id'
 ````
-## Generate the JWT keys
-````Bash
-$ mkdir -p config/jwt
-$ openssl genrsa -out config/jwt/private.pem -aes256 4096
-$ openssl rsa -pubout -in config/jwt/private.pem -out var/jwt/public.pem
+
+
+#### Generating asymmetric signing and verification key
+
+You can use the following shell commands to generate a public-key pair
+suitable for use with this bundle:
+
+````sh
+mkdir -p config/secrets/jwt
+openssl genrsa -out config/secrets/jwt/key.pem -aes256 4096
+openssl rsa -pubout -in config/secrets/jwt/key.pem -out config/secrets/jwt/key.pub.pem
 ````
 
+Note that you probably don't want to commit the private key (especially if you don't specify a password).
+You can use [Symfony Secrets](https://symfony.com/doc/current/configuration/secrets.html)
+to to store the file(s) and/or the decryption key.
 
-## Configure JWT Types on config.yaml
+
+### Configure JWT Types
 You can specify JWT Type on your basic config.yaml.
 If configuration is null, system set default configuration
+
 ````YAML
+// config/packages/jwt.yaml
 jwt:  
   types:
     authorization: #name of type
@@ -55,32 +107,38 @@ jwt:
         audience: ''
         subject: ''
 ````
+
 using on controller:
+
 ````PHP
-<?php
-/**
- * Class UserConfirm
- */
+// src/Controller/UserConfirmController.php
+
+use PhpSolution\JwtBundle\Jwt\TokenManagerInterface;
+
 class UserConfirmController extends Controller
 {
+    private TokenManagerInterface $tokenManager;
+
+    public function __construct(TokenManagerInterface $tokenManager){
+        $this->tokenManager = $tokenManager;
+    }
+
     public function sendLinkAction(): Response
     {
-        /* @var $token \Lcobucci\JWT\Token\Plain */
-        $token = $this->get('jwt.manager')->create('authorization', ['claim' => 'value']);
-        $jwtStr = $token->__toString();
+        $token = $this->tokenManager->create('authorization', ['claim' => 'value']);
+        $jwtStr = $token->toString(); // this is your encoded JWT token
     }
-    
+
     public function confirmAction(string $token): Response
     {
-        /* @var $token \Lcobucci\JWT\Token\Plain */
-        $token = $this->get('jwt.manager')->parse($token, 'authorization');
-        $userId = $token->claims()->get('user_id');
+        $token = $this->tokenManager->parseTokenWithClaims($token, 'authorization', ['claim']);
+        $userId = $token->claims()->get('claim');
     }
 }
 ````
 
 
-## Specify JWT Type as a service
+## Specify JWT Types as services
 
 Create the token type, making sure *at the very least* the *SignedWith* constraint
 is returned by `getConstraints` - otherwise your token will be unsafe and not verified:
