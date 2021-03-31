@@ -17,8 +17,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('jwt');
+        $treeBuilder = new TreeBuilder('jwt');
+        $rootNode = $treeBuilder->getRootNode();
         $this->addConfigurationSection($rootNode);
         $this->addConfigurableTypeSection($rootNode);
 
@@ -97,6 +97,11 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('options')
                                 ->children()
                                     ->arrayNode(ConfigurableType::OPTION_HEADERS)
+                                        ->canBeUnset()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                    ->arrayNode('claimes')
+                                        ->setDeprecated(sprintf('The "%%node%%" option is deprecated. Use "%s" instead.', ConfigurableType::OPTION_CLAIMS))
                                         ->canBeUnset()
                                         ->prototype('scalar')->end()
                                     ->end()

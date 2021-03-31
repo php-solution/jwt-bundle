@@ -23,7 +23,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
         self::OPTION_AUDIENCE,
         self::OPTION_SUBJECT,
     ];
-    public const OPTION_CLAIMS = 'claimes';
+    public const OPTION_CLAIMS = 'claims';
     public const OPTION_HEADERS = 'headers';
     public const OPTION_ISSUER = 'issuer';
     public const OPTION_ISSUED_AT = 'issued_at';
@@ -105,7 +105,7 @@ class ConfigurableType extends BasicType implements TypeConfigInterface
     public function getConstraints(Configuration $config):? iterable
     {
         yield from parent::getConstraints($config);
-        yield new Constraint\ValidAt(new SystemClock());
+        yield new Constraint\LooseValidAt(SystemClock::fromSystemTimezone());
         if (array_key_exists(static::OPTION_SUBJECT, $this->options) && !empty($this->options[static::OPTION_SUBJECT])) {
             yield new Constraint\RelatedTo($this->options[static::OPTION_SUBJECT]);
         }

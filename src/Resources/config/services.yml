@@ -1,15 +1,19 @@
 services:
     jwt.manager:
-        public: true
+        public: false
         class: 'PhpSolution\JwtBundle\Jwt\JwtManager'
-        arguments: ['@jwt.configuration_registry', '@jwt.token_type_registry']
+        arguments:
+            - '@jwt.configuration_registry'
+            - '@jwt.token_type_registry'
 
     jwt.token_type_registry:
         public: false
         class: 'PhpSolution\JwtBundle\Jwt\Type\TypeRegistry'
-        arguments: [~]
 
     jwt.configuration_registry:
         public: false
         class: 'PhpSolution\JwtBundle\Jwt\Configuration\ConfigRegistry'
-        arguments: [~]
+
+    PhpSolution\JwtBundle\Jwt\TokenManagerInterface:
+        public: true
+        alias: 'jwt.manager'

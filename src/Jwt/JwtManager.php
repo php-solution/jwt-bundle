@@ -3,9 +3,12 @@
 namespace PhpSolution\JwtBundle\Jwt;
 
 use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Exception;
 use Lcobucci\JWT\Token;
-use Lcobucci\JWT\Validation\InvalidTokenException;
+use Lcobucci\JWT\UnencryptedToken;
+use Lcobucci\JWT\Validation\ConstraintViolation;
 use PhpSolution\JwtBundle\Jwt\Configuration\ConfigRegistry;
+use PhpSolution\JwtBundle\Jwt\Exception\InvalidTokenType;
 use PhpSolution\JwtBundle\Jwt\Type\TypeConfigInterface;
 use PhpSolution\JwtBundle\Jwt\Type\TypeInterface;
 use PhpSolution\JwtBundle\Jwt\Type\TypeRegistry;
@@ -13,7 +16,7 @@ use PhpSolution\JwtBundle\Jwt\Type\TypeRegistry;
 /**
  * Class JwtTokenManager
  */
-class JwtManager
+class JwtManager implements TokenManagerInterface
 {
     /**
      * @var ConfigRegistry
@@ -48,7 +51,7 @@ class JwtManager
         /* @var $type TypeInterface|TypeConfigInterface */
         $type = $this->typeRegistry->getTypeByName($typeName);
         $config = $this->getConfigurationByType($type);
-        $builder = $config->createBuilder();
+        $builder = $config->builder();
         $builder->issuedAt((new \DateTimeImmutable())->setTimestamp(\time() - 1));
         foreach ($claims as $claimName => $claimValue) {
             $builder->withClaim($claimName, $claimValue);
@@ -59,7 +62,7 @@ class JwtManager
         $builder->relatedTo($typeName);
         $type->configureBuilder($builder);
 
-        return $builder->getToken($config->getSigner(), $config->getSigningKey());
+        return $builder->getToken($config->signer(), $config->signingKey());
     }
 
     /**
@@ -68,17 +71,17 @@ class JwtManager
      *
      * @return Token
      *
-     * @throws InvalidTokenException
+     * @throws Exception
      */
     public function parse(string $jwt, string $typeName): Token
     {
         $type = $this->typeRegistry->getTypeByName($typeName);
         $config = $this->getConfigurationByType($type);
-        $token = $config->getParser()->parse($jwt);
+        $token = $config->parser()->parse($jwt);
 
         $constraints = $type->getConstraints($config);
         if (is_iterable($constraints)) {
-            $config->getValidator()->assert($token, ...$constraints);
+            $config->validator()->assert($token, ...$constraints);
         }
 
         return $token;
@@ -89,21 +92,21 @@ class JwtManager
      * @param string $tokenType
      * @param array  $requiredClaims
      *
-     * @return Token
-     * @throws InvalidTokenException
+     * @return UnencryptedToken
+     * @throws Exception
      */
-    public function parseTokenWithClaims(string $tokenStr, string $tokenType, array $requiredClaims): Token
+    public function parseTokenWithClaims(string $tokenStr, string $tokenType, array $requiredClaims): UnencryptedToken
     {
-        /* @var $jwtToken Token\Plain */
+        /* @var $jwtToken UnencryptedToken */
         $jwtToken = $this->parse($tokenStr, $tokenType);
-        if (!$jwtToken instanceof Token\Plain) {
-            throw new InvalidTokenException(sprintf('Token must be instanceof "%s"', Token\Plain::class));
+        if (!$jwtToken instanceof UnencryptedToken) {
+            throw new InvalidTokenType(sprintf('Token must be an instanceof "%s".', UnencryptedToken::class));
         }
 
         $claims = $jwtToken->claims();
         foreach ($requiredClaims as $claim) {
             if (!$claims->has($claim)) {
-                throw new InvalidTokenException(sprintf('Undefined claim "%s" for token', $claim));
+                throw new ConstraintViolation(sprintf('Undefined claim "%s" for token', $claim));
             }
         }
 

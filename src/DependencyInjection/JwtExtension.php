@@ -3,12 +3,15 @@
 namespace PhpSolution\JwtBundle\DependencyInjection;
 
 use PhpSolution\JwtBundle\Jwt\Configuration\ConfigFactory;
+use PhpSolution\JwtBundle\Jwt\Type\TypeInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use function array_merge;
+use function is_array;
 
 /**
  * Class JwtExtension
@@ -21,14 +24,43 @@ class JwtExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $container->registerForAutoconfiguration(TypeInterface::class)
+            ->addTag('jwt.token_type');
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
+        $config = $this->fixOldConfig($config);
+
         $this->registerConfigurations($config, $container);
         $this->registerTypes($config, $container);
+    }
+
+    private function fixOldConfig(array $config): array
+    {
+        if (!isset($config['types']) || !is_array($config['types'])) {
+            return $config;
+        }
+
+        foreach ($config['types'] as $type => $typeConfig) {
+            if (!isset($typeConfig['options']['claimes']) || !is_array($typeConfig['options']['claimes'])) {
+                continue;
+            }
+
+            $claims = $typeConfig['options']['claimes'];
+            if (isset($typeConfig['options']['claims']) && is_array($typeConfig['options']['claims'])) {
+                // new field overrides old values
+                $claims = array_merge($claims, $typeConfig['options']['claims']);
+            }
+
+            $config['types'][$type]['options']['claims'] = $claims;
+            unset($config['types'][$type]['options']['claimes']);
+        }
+
+        return $config;
     }
 
     /**
@@ -38,7 +70,7 @@ class JwtExtension extends Extension
     private function registerConfigurations(array $configs, ContainerBuilder $container): void
     {
         $registryDef = $container->getDefinition('jwt.configuration_registry');
-        $registryDef->replaceArgument(0, $configs['default_configuration']);
+        $registryDef->setArgument(0, $configs['default_configuration']);
 
         foreach ($configs['configurations'] as $name => $conf) {
             $def = (new Definition(ConfigFactory::class))
